@@ -449,7 +449,7 @@ const messages=['Every little step through Teyvat matters. ☾','The moon watche
 $('moonDailyMessage').textContent=messages[Math.floor(Date.now()/86400000)%messages.length];
 $('moonTheme').value=data.theme;$('moonFavorite').value=data.favorite;$('moonSpecialty').value=data.specialty;
 document.body.dataset.moonTheme=data.theme;
-$('moonTheme').onchange=e=>{data.theme=e.target.value;document.body.dataset.moonTheme=data.theme;save()};
+$('moonTheme').onchange=e=>{data.theme=e.target.value;document.body.dataset.moonTheme=data.theme;save();const fairy=document.getElementById('fairyThemeSound');if(fairy){fairy.pause();fairy.currentTime=0;fairy.volume=.55;fairy.play().catch(()=>{});}};
 $('moonSaveProfile').onclick=()=>{data.favorite=$('moonFavorite').value.trim();data.specialty=$('moonSpecialty').value.trim();save();$('moonProfileStatus').textContent='Profile saved on this device ♡'};
 const phrases=['The moon is especially beautiful today. ☾','Thank you for visiting, traveler. ♡','Remember to take a little break. 🪽','May the stars guide your journey. ✧'];
 $('moonHello').onclick=()=>{const msg=phrases[Math.floor(Math.random()*phrases.length)];$('moonColombinaSays').textContent='Colombina: '+msg;const p=document.querySelector('.colombina-perch');if(p){p.style.filter='drop-shadow(0 0 14px #e6caff)';setTimeout(()=>p.style.filter='',1200)}};
@@ -528,4 +528,4 @@ if(!bad)return;
 e.preventDefault();e.stopImmediatePropagation();warning();
 },true);
 
-})();</script></body></html>
+})();</script><audio id="fairyThemeSound" src="fairyeffect.mp3" preload="auto"></audio></body></html>
