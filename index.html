@@ -351,8 +351,8 @@ render();
 const gate=document.getElementById('staffGate'),form=document.getElementById('gateForm'),field=document.getElementById('gatePassword'),err=document.getElementById('gateError');
 const password='LunaireWings#2709';
 let moonVerified=false;document.querySelectorAll('[data-moon-choice]').forEach(btn=>btn.addEventListener('click',()=>{moonVerified=btn.dataset.moonChoice==='moon';document.querySelectorAll('[data-moon-choice]').forEach(b=>b.classList.toggle('chosen',moonVerified&&b===btn));document.getElementById('moonStatus').textContent=moonVerified?'✓ Moonlight verified! ♡':'Not quite — find the crescent moon ✧';err.textContent='';}));
-function unlock(){document.body.classList.remove('locked');gate.hidden=true;gate.style.display='none';sessionStorage.setItem('teyvat_staff_gate','yes');}
-if(sessionStorage.getItem('teyvat_staff_gate')==='yes')unlock();
+function unlock(){document.body.classList.remove('locked');gate.hidden=true;gate.style.display='none';try{localStorage.setItem('teyvat_staff_gate_unlocked','yes');sessionStorage.setItem('teyvat_staff_gate','yes')}catch(e){}}
+try{if(localStorage.getItem('teyvat_staff_gate_unlocked')==='yes'||sessionStorage.getItem('teyvat_staff_gate')==='yes')unlock()}catch(e){}
 form.addEventListener('submit',function(e){e.preventDefault();if(!moonVerified){err.textContent='Complete the moonlight check first ♡';return;}if(field.value===password){unlock();field.value='';err.textContent='';}else{err.textContent='That password is not quite right. Try again ♡';field.select();}});
 })();
 </script><script>
