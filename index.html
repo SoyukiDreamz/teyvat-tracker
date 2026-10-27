@@ -23,8 +23,106 @@ $('import').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].te
 const known=['Windrest Peak','Brightcrown Mountains','Starfell Valley','Windwail Highland','Galesong Hill','Bishui Plain','Minlin','Qiongji Estuary','Sea of Clouds','Lisha','The Chasm','Mt. Laixin','Chenyu Vale: Upper Vale','Chenyu Vale: Southern Mountain','Lokapala Jungle','Vissudha Field','Ashavan Realm','Ardravi Valley','Desert of Hadramaveth','Land of Lower Setekh','Land of Upper Setekh','Hypostyle Desert','Realm of Farakhkert','Gavireh Lajavard','Court of Fontaine Region','Erinnyes Forest','Morte Region','Beryl Region','Belleau Region','Liffey Region','Institute of Kinetic Energy Engineering Region','Nostoi Region','Ochkanatlan','Paha Isle','Lempo Isle','Hiisi Island','Ashveil Peak','Wavechaser Plain','Voidsea Outlook','Dunanna Pit','Everfrozen Earth','Flamefeather Valley','Volkodlak Tundra','Felifrost Peak','White Birch Snowgrave','Quahuacan Cliff','Tezcatepetonco Range','Basin of Unnumbered Flames','Tequemecan Valley','Coatepec Mountain','Toyac Springs','Atocpan'];
 function normalize(s){return s.toLowerCase().replace(/[^a-z0-9]/g,'');}
 function editDistance(a,b){const d=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let last=d[0];d[0]=i;for(let j=1;j<=b.length;j++){let tmp=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,last+(a[i-1]===b[j-1]?0:1));last=tmp;}}return d[b.length];}
-function parseOCR(text){const lines=text.split(/\n/).map(s=>s.trim()).filter(Boolean),found=[];for(let i=0;i<lines.length;i++){const m=lines[i].match(/(?:Exploration\s*Progress\s*[:：]?\s*)(\d{1,3})\s*%/i);if(!m)continue;const pct=Number(m[1]);if(pct>100)continue;const before=lines.slice(Math.max(0,i-3),i).join(' ');const candidates=known.map(n=>({n,score:editDistance(normalize(before.slice(-n.length-12)),normalize(n))})).sort((a,b)=>a.score-b.score);const best=candidates[0];if(best&&best.score<=Math.max(5,Math.ceil(best.n.length*.4)))found.push({name:best.n,pct});}return found;}
-function parseSpatial(ocr){const words=(ocr.words||[]).filter(w=>w.text&&w.bbox);const found=[];for(const w of words){if(!/^(?:\\d{1,3}%|\\d{1,3})$/.test(w.text.trim()))continue;const pct=Number(w.text.replace('%',''));if(pct>100)continue;const x=w.bbox.x0,y=w.bbox.y0;const nearby=words.filter(v=>v.bbox&&Math.abs(v.bbox.y0-y)<Math.max(34,(w.bbox.y1-w.bbox.y0)*2)&&v.bbox.x0<x).sort((a,b)=>a.bbox.x0-b.bbox.x0).map(v=>v.text).join(' ');if(!/Exploration|Progress/i.test(nearby))continue;const names=words.filter(v=>v.bbox&&v.bbox.y1<y&&y-v.bbox.y1<150&&Math.abs((v.bbox.x0+v.bbox.x1)/2-x)<350).sort((a,b)=>a.bbox.y0-b.bbox.y0||a.bbox.x0-b.bbox.x0).map(v=>v.text).join(' ');const candidates=known.map(n=>({n,score:editDistance(normalize(names.slice(-n.length-15)),normalize(n))})).sort((a,b)=>a.score-b.score);if(candidates[0]&&candidates[0].score<Math.max(6,candidates[0].n.length*.5))found.push({name:candidates[0].n,pct});}return found;}
-$('scan').onclick=async()=>{const files=Array.from($('images').files||[]);if(!files.length){alert('Select screenshots first.');return;}$('scan').disabled=true;$('scanResults').innerHTML='';$('status').textContent='Loading OCR...';try{if(!window.Tesseract){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=resolve;s.onerror=()=>reject(Error('OCR library unavailable. Check internet connection.'));document.head.appendChild(s);});}const worker=await Tesseract.createWorker('eng');const all=[],raw=[];try{for(let i=0;i<files.length;i++){$('status').textContent='Scanning '+(i+1)+' / '+files.length+'...';const r=await worker.recognize(files[i],{}, {text:true,blocks:true});raw.push('--- '+files[i].name+' ---\\n'+r.data.text);all.push(...parseOCR(r.data.text),...parseSpatial(r.data));}}finally{await worker.terminate();}const unique=new Map(all.map(x=>[x.name,x]));$('status').textContent=unique.size+' possible zones detected. Review before saving. If zones are missing, see OCR text below and add them manually.';$('scanResults').innerHTML=Array.from(unique.values()).map(v=>'<div class="row"><input aria-label="Zone" class="detName" value="'+escapeHTML(v.name)+'" style="flex:1;min-width:140px"><input aria-label="Percent" class="detPct" type="number" min="0" max="100" value="'+v.pct+'"><label><input class="detCheck" type="checkbox" checked> Save</label></div>').join('')+(unique.size?'<button id="acceptScans">Save checked results</button>':'<p>No confident matches. Try a clearer screenshot or add zones manually.</p>')+'<details><summary>Show recognized text (helps find missed zones)</summary><textarea rows="12" readonly>'+escapeHTML(raw.join('\\n\\n'))+'</textarea></details>';const btn=$('acceptScans');if(btn)btn.onclick=()=>{let count=0;document.querySelectorAll('#scanResults .row').forEach(row=>{if(row.querySelector('.detCheck').checked&&setZone(row.querySelector('.detName').value,row.querySelector('.detPct').value))count++;});$('status').textContent=count+' zones saved.';};}catch(err){$('status').textContent='Scanner error: '+err.message;}finally{$('scan').disabled=false;}};
+
+function candidateName(text){
+ const clean=normalize(text);if(!clean)return null;
+ const ranked=known.map(n=>{const k=normalize(n);let score=editDistance(clean.slice(-k.length),k);if(clean.includes(k))score=0;return {n,score,ratio:score/Math.max(k.length,1)};}).sort((a,b)=>a.ratio-b.ratio);
+ return ranked[0]&&ranked[0].ratio<.35?ranked[0].n:null;
+}
+function pctFromText(text){
+ const a=[...text.matchAll(/(?:exploration\s*(?:progress)?\s*[:：-]?\s*)?(\d{1,3})\s*[%％]/gi)];
+ return a.map(m=>Number(m[1])).filter(v=>v>=0&&v<=100);
+}
+function parsePass(result,source,pass){
+ const items=[], lines=result.data.lines||[];
+ for(let i=0;i<lines.length;i++){
+   const line=lines[i],t=line.text||'';
+   for(const pct of pctFromText(t)){
+     const near=lines.filter(l=>l.bbox&&line.bbox&&l.bbox.y1<=line.bbox.y1+15&&l.bbox.y0>line.bbox.y0-175&&Math.abs(l.bbox.x0-line.bbox.x0)<450)
+       .sort((a,b)=>a.bbox.y0-b.bbox.y0).map(l=>l.text).join(' ');
+     const name=candidateName(near)||candidateName(lines.slice(Math.max(0,i-3),i).map(l=>l.text).join(' '));
+     items.push({name:name||'',pct,source,pass,context:near.slice(0,100),confidence:name?'matched':'review'});
+   }
+ }
+ const txt=result.data.text||'';
+ for(const line of txt.split(/\n/)){
+   const percentages=pctFromText(line);
+   for(const pct of percentages){
+     if(!items.some(v=>v.pct===pct))items.push({name:candidateName(line)||'',pct,source,pass,context:line.slice(0,100),confidence:'review'});
+   }
+ }
+ return items;
+}
+async function makeImage(file){
+ return await new Promise((resolve,reject)=>{const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};img.onerror=()=>{URL.revokeObjectURL(url);reject(Error('Cannot open screenshot'))};img.src=url;});
+}
+function canvasFor(img,region,mode){
+ const [rx,ry,rw,rh]=region,c=document.createElement('canvas'),scale=Math.min(2.3,Math.max(1.2,1900/(img.width*rw)));
+ c.width=Math.round(img.width*rw*scale);c.height=Math.round(img.height*rh*scale);
+ const ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,img.width*rx,img.height*ry,img.width*rw,img.height*rh,0,0,c.width,c.height);
+ if(mode!=='normal'){
+  const im=ctx.getImageData(0,0,c.width,c.height),d=im.data;
+  for(let i=0;i<d.length;i+=4){
+   const gray=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+   const v=mode==='contrast'?Math.max(0,Math.min(255,(gray-128)*2+128)):(gray>155?255:0);
+   d[i]=d[i+1]=d[i+2]=v;
+  }ctx.putImageData(im,0,0);
+ }
+ return c;
+}
+function renderCandidates(items,raw){
+ const box=$('scanResults');box.replaceChildren();
+ const summary=document.createElement('p');summary.textContent=items.length+' possible readings. Check the screenshot, zone and percentage carefully before saving.';box.append(summary);
+ items.forEach((item,i)=>{
+  const row=document.createElement('div');row.className='zone';
+  const title=document.createElement('small');title.textContent=item.source+' · '+item.pass+(item.confidence==='review'?' · ⚠ needs review':'');
+  const controls=document.createElement('div');controls.className='row';
+  const name=document.createElement('input');name.className='detName';name.placeholder='Zone name';name.value=item.name;name.style.flex='1';name.style.minWidth='130px';
+  const pct=document.createElement('input');pct.className='detPct';pct.type='number';pct.min=0;pct.max=100;pct.value=item.pct;
+  const label=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.className='detCheck';check.checked=!!item.name;label.append(check,document.createTextNode(' Save'));
+  controls.append(name,pct,label);row.append(title,controls);box.append(row);
+ });
+ const saveBtn=document.createElement('button');saveBtn.textContent='Save checked results';saveBtn.onclick=()=>{
+  let count=0;box.querySelectorAll('.zone').forEach(row=>{if(row.querySelector('.detCheck').checked&&setZone(row.querySelector('.detName').value,row.querySelector('.detPct').value))count++;});
+  $('status').textContent=count+' readings saved. Please review the zone list.';};
+ box.append(saveBtn);
+ const details=document.createElement('details'),summary2=document.createElement('summary'),area=document.createElement('textarea');
+ summary2.textContent='Show full OCR text (all passes)';area.readOnly=true;area.rows=12;area.value=raw.join('\n\n');details.append(summary2,area);box.append(details);
+}
+$('scan').onclick=async()=>{
+ const files=Array.from($('images').files||[]);if(!files.length){alert('Select screenshots first.');return;}
+ $('scan').disabled=true;$('scanResults').replaceChildren();$('status').textContent='Loading OCR...';
+ let worker;
+ try{
+  if(!window.Tesseract)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';script.onload=resolve;script.onerror=()=>reject(Error('OCR library failed to load'));document.head.append(script);});
+  worker=await Tesseract.createWorker('eng');
+  const results=[],raw=[];
+  for(let i=0;i<files.length;i++){
+   const img=await makeImage(files[i]);
+   // Whole image + four overlapping quadrants: larger text, less clutter.
+   const passes=[[[0,0,1,1],'normal'],[[0,0,1,1],'contrast'],[[0,0,.58,.58],'normal'],[[.42,0,.58,.58],'normal'],[[0,.42,.58,.58],'normal'],[[.42,.42,.58,.58],'normal']];
+   for(let j=0;j<passes.length;j++){
+    $('status').textContent='Screenshot '+(i+1)+'/'+files.length+' — pass '+(j+1)+'/'+passes.length+'. This may take a while on Android.';
+    const [rect,mode]=passes[j],canvas=canvasFor(img,rect,mode);
+    const output=await worker.recognize(canvas,{}, {text:true,blocks:true});
+    const label='pass '+(j+1);
+    raw.push('--- '+files[i].name+' '+label+' ---\n'+(output.data.text||''));
+    results.push(...parsePass(output,files[i].name,label));
+    canvas.width=canvas.height=1;
+   }
+  }
+  // Keep one row per zone+percentage, but retain unassigned readings for review.
+  const unique=new Map();
+  for(const item of results){
+   const key=item.name?normalize(item.name)+'-'+item.pct:item.source+'-'+item.pct;
+   const existing=unique.get(key);
+   if(!existing||(!existing.name&&item.name))unique.set(key,item);
+  }
+  const arr=[...unique.values()];
+  $('status').textContent=arr.length+' potential readings found across '+files.length+' screenshot(s). Unnamed percentages are kept for review.';
+  renderCandidates(arr,raw);
+ }catch(err){$('status').textContent='Scan error: '+err.message;}
+ finally{if(worker)await worker.terminate().catch(()=>{});$('scan').disabled=false;}
+};
 render();
 </script></body></html>
