@@ -449,7 +449,7 @@ const messages=['Every little step through Teyvat matters. ☾','The moon watche
 $('moonDailyMessage').textContent=messages[Math.floor(Date.now()/86400000)%messages.length];
 $('moonTheme').value=data.theme;$('moonFavorite').value=data.favorite;$('moonSpecialty').value=data.specialty;
 document.body.dataset.moonTheme=data.theme;
-$('moonTheme').onchange=e=>{data.theme=e.target.value;document.body.dataset.moonTheme=data.theme;save();const fairy=document.getElementById('fairyThemeSound');if(fairy){fairy.pause();fairy.currentTime=0;fairy.volume=.55;fairy.play().catch(()=>{});}};
+$('moonTheme').onchange=e=>{data.theme=e.target.value;document.body.dataset.moonTheme=data.theme;save();window.playFairyThemeSound?.();};
 $('moonSaveProfile').onclick=()=>{data.favorite=$('moonFavorite').value.trim();data.specialty=$('moonSpecialty').value.trim();save();$('moonProfileStatus').textContent='Profile saved on this device ♡'};
 const phrases=['The moon is especially beautiful today. ☾','Thank you for visiting, traveler. ♡','Remember to take a little break. 🪽','May the stars guide your journey. ✧'];
 $('moonHello').onclick=()=>{const msg=phrases[Math.floor(Math.random()*phrases.length)];$('moonColombinaSays').textContent='Colombina: '+msg;const p=document.querySelector('.colombina-perch');if(p){p.style.filter='drop-shadow(0 0 14px #e6caff)';setTimeout(()=>p.style.filter='',1200)}};
@@ -528,4 +528,44 @@ if(!bad)return;
 e.preventDefault();e.stopImmediatePropagation();warning();
 },true);
 
-})();</script><audio id="fairyThemeSound" src="fairyeffect.mp3" preload="auto"></audio></body></html>
+})();</script><audio id="fairyThemeSound" src="fairyeffect.mp3" preload="auto"></audio><script>
+/* Predecode the fairy sound and skip its silent beginning for immediate theme feedback. */
+(function(){
+let context=null,buffer=null,onset=0,active=null;
+const fallback=document.getElementById('fairyThemeSound');
+async function preload(){
+ try{
+  const AudioContextClass=window.AudioContext||window.webkitAudioContext;
+  if(!AudioContextClass)return;
+  context=new AudioContextClass();
+  const response=await fetch('fairyeffect.mp3');
+  if(!response.ok)throw new Error('Fairy sound unavailable');
+  buffer=await context.decodeAudioData(await response.arrayBuffer());
+  const channel=buffer.getChannelData(0),rate=buffer.sampleRate;
+  const step=Math.max(1,Math.floor(rate*.005));
+  let first=0;
+  for(let i=0;i<channel.length;i+=step){
+   let peak=0;for(let j=i;j<Math.min(i+step,channel.length);j++)peak=Math.max(peak,Math.abs(channel[j]));
+   if(peak>.012){first=i;break;}
+  }
+  onset=Math.max(0,first/rate-.008);
+ }catch(e){buffer=null;}
+}
+const loading=preload();
+window.playFairyThemeSound=async function(){
+ if(buffer&&context){
+  try{
+   if(context.state!=='running')await context.resume();
+   if(active){try{active.stop()}catch(e){}}
+   const source=context.createBufferSource(),gain=context.createGain();
+   source.buffer=buffer;gain.gain.value=.55;source.connect(gain).connect(context.destination);
+   source.start(0,onset);active=source;source.onended=()=>{if(active===source)active=null};
+   return;
+  }catch(e){}
+ }
+ // Fallback for browsers without Web Audio decoding.
+ fallback.pause();fallback.currentTime=0;fallback.volume=.55;
+ fallback.play().catch(()=>{});
+ };
+})();
+</script></body></html>
