@@ -4,6 +4,7 @@
 <section><h2>♡ Choose profile</h2><div class="row"><select id="profile"></select><button id="addProfile">+ New client / profile</button><button id="removeProfile" class="danger">Delete profile</button></div><small>Profiles and progress are stored on this device. Never enter game passwords.</small></section>
 <section><h2>🗺️ Exploration progress</h2><div class="row"><input id="zoneName" placeholder="Zone name (e.g. Windrest Peak)" style="flex:1;min-width:180px"><input id="zonePct" type="number" min="0" max="100" placeholder="%"><button id="saveZone">Save zone</button></div><div id="zones"></div></section>
 <section><h2>📷 Scan screenshots (beta)</h2><p>Choose one or several screenshots. The scanner tries to read zone names and percentages. <b>Review every result before saving.</b></p><input type="file" id="images" accept="image/*" multiple><div class="row"><button id="scan">Scan screenshots</button></div><p id="status" class="muted"></p><div id="scanResults"></div><small>Text recognition needs internet to load the OCR library. Screenshots are processed in your browser; they are not uploaded by this site. Some labels may be missed or read incorrectly.</small></section>
+<section><h2>🎥 Scan video (beta)</h2><p>Upload an Android screen recording of your Genshin map. The tracker samples frames and reads visible exploration percentages. Review all matches before saving.</p><input id="videoFile" type="file" accept="video/*"><div class="row"><label>Sample every <select id="videoStep"><option value="2">2 seconds (detailed)</option><option value="4" selected>4 seconds (recommended)</option><option value="8">8 seconds (faster)</option></select></label><button id="videoScan">Scan video</button><button id="videoCancel" class="danger" disabled>Cancel</button></div><p id="videoStatus" class="muted"></p><div id="videoResults"></div><small>Videos stay on your device. Long recordings can be slow or use significant memory. Some Android browsers cannot decode certain video formats. No detection is guaranteed for obscured or blurry labels.</small></section>
 <section><h2>📈 Progress history</h2><div id="history"></div></section>
 <section><h2>💾 Backup</h2><div class="row"><button id="export">Export backup</button><label>Import backup <input type="file" id="import" accept=".json,application/json"></label></div><small>Export regularly. GitHub Pages does not sync data between devices automatically.</small></section>
 </main><footer>Made for Teyvat Pilots ♡</footer><script>
@@ -124,5 +125,65 @@ $('scan').onclick=async()=>{
  }catch(err){$('status').textContent='Scan error: '+err.message;}
  finally{if(worker)await worker.terminate().catch(()=>{});$('scan').disabled=false;}
 };
+
+let videoStop=false;
+function videoSeek(video,time){
+ return new Promise((resolve,reject)=>{
+  const timer=setTimeout(()=>{cleanup();reject(Error('Video frame timed out'));},12000);
+  const cleanup=()=>{clearTimeout(timer);video.removeEventListener('seeked',done);video.removeEventListener('error',fail)};
+  const done=()=>{cleanup();resolve()};
+  const fail=()=>{cleanup();reject(Error('Cannot decode video frame'))};
+  video.addEventListener('seeked',done,{once:true});video.addEventListener('error',fail,{once:true});
+  video.currentTime=Math.min(Math.max(0,time),Math.max(0,video.duration-.05));
+ });
+}
+$('videoCancel').onclick=()=>{videoStop=true;$('videoStatus').textContent='Stopping after current frame...';};
+$('videoScan').onclick=async()=>{
+ const file=$('videoFile').files[0];if(!file){alert('Choose a video first.');return;}
+ $('videoScan').disabled=true;$('videoCancel').disabled=false;videoStop=false;$('videoResults').replaceChildren();
+ let worker,video,url;
+ try{
+  $('videoStatus').textContent='Loading video...';
+  video=document.createElement('video');video.muted=true;video.playsInline=true;video.preload='auto';url=URL.createObjectURL(file);
+  video.src=url;
+  await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Video could not be opened on this browser')),18000);video.onloadedmetadata=()=>{clearTimeout(timer);resolve()};video.onerror=()=>{clearTimeout(timer);reject(Error('Unsupported video format'))};});
+  if(!Number.isFinite(video.duration)||video.duration<=0)throw Error('Video duration unavailable');
+  if(!window.Tesseract)await new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';script.onload=resolve;script.onerror=()=>reject(Error('OCR library failed to load'));document.head.append(script);});
+  worker=await Tesseract.createWorker('eng');
+  const step=Number($('videoStep').value)||4,maxFrames=150,total=Math.min(maxFrames,Math.ceil(video.duration/step)),found=[],raw=[];
+  const frame=document.createElement('canvas'),ctx=frame.getContext('2d',{willReadFrequently:true});
+  const scale=Math.min(1.5,1600/video.videoWidth);frame.width=Math.round(video.videoWidth*scale);frame.height=Math.round(video.videoHeight*scale);
+  for(let i=0;i<total&&!videoStop;i++){
+   const t=Math.min(i*step+.15,video.duration-.05);
+   $('videoStatus').textContent='Analyzing frame '+(i+1)+'/'+total+' ('+Math.floor(t)+'s / '+Math.floor(video.duration)+'s). This can take several minutes.';
+   await videoSeek(video,t);
+   ctx.drawImage(video,0,0,frame.width,frame.height);
+   const output=await worker.recognize(frame,{}, {text:true,blocks:true});
+   const label='Video '+Math.floor(t)+'s';
+   found.push(...parsePass(output,file.name,label));
+   raw.push('--- '+label+' ---\n'+(output.data.text||''));
+  }
+  const unique=new Map();
+  for(const item of found){
+   const key=item.name?normalize(item.name)+'-'+item.pct:'unknown-'+item.pct;
+   if(!unique.has(key))unique.set(key,item);
+  }
+  const arr=[...unique.values()];
+  $('videoStatus').textContent=(videoStop?'Stopped. ':'Complete. ')+arr.length+' possible readings. Check each one before saving.';
+  // Reuse the same review UI by temporarily swapping the results target.
+  const original=$('scanResults'),container=$('videoResults');
+  renderCandidates(arr,raw);
+  while(original.firstChild)container.appendChild(original.firstChild);
+  // Move the save handler to the video container (renderCandidates initially bound to scanResults).
+  const btn=container.querySelector('button');
+  if(btn)btn.onclick=()=>{
+   let count=0;container.querySelectorAll('.zone').forEach(row=>{
+    if(row.querySelector('.detCheck').checked&&setZone(row.querySelector('.detName').value,row.querySelector('.detPct').value))count++;
+   });$('videoStatus').textContent=count+' readings saved.';
+  };
+ }catch(err){$('videoStatus').textContent='Video scanner error: '+err.message;}
+ finally{if(worker)await worker.terminate().catch(()=>{});if(video){video.pause();video.removeAttribute('src');video.load();}if(url)URL.revokeObjectURL(url);$('videoScan').disabled=false;$('videoCancel').disabled=true;}
+};
+
 render();
 </script></body></html>
