@@ -1,84 +1,29 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Teyvat Pilot Tracker</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #eaf3ff;
-  color: #344966;
-  padding: 20px;
-}
-main {
-  max-width: 600px;
-  margin: auto;
-}
-section {
-  background: white;
-  padding: 20px;
-  border-radius: 15px;
-  margin: 15px 0;
-}
-button {
-  background: #a9c8ed;
-  border: none;
-  padding: 12px;
-  border-radius: 10px;
-}
-input { padding: 10px; max-width: 90%; }
-</style>
-</head>
-<body>
-<main>
-<h1>୨୧ Teyvat Pilot Tracker</h1>
-<p>Your journey, made a little easier ♡</p>
-
-<section>
-<h2>🌸 My Exploration</h2>
-<p>Track your personal Genshin progress.</p>
-</section>
-
-<section>
-<h2>🪽 Teyvat Pilots</h2>
-<p>Manage your clients and orders.</p>
-</section>
-
-<section>
-<h2>🗺️ Exploration Progress</h2>
-<label for="region">Region:</label>
-<input id="region" placeholder="Fontaine">
-<br><br>
-<label for="progress">Exploration %:</label>
-<input id="progress" type="number" min="0" max="100">
-<br><br>
-<button onclick="save()">Save Progress</button>
-<p id="result"></p>
-</section>
-</main>
-
-<script>
-function save() {
-  const region = document.getElementById("region").value;
-  const progress = document.getElementById("progress").value;
-  if (!region || progress === "" || Number(progress) < 0 || Number(progress) > 100) {
-    alert("Enter a region and a percentage between 0 and 100.");
-    return;
-  }
-  localStorage.setItem("region", region);
-  localStorage.setItem("progress", progress);
-  show();
-}
-function show() {
-  const region = localStorage.getItem("region");
-  const progress = localStorage.getItem("progress");
-  if (region !== null && progress !== null) {
-    document.getElementById("result").textContent =
-      region + ": " + progress + "%";
-  }
-}
-show();
-</script>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teyvat Pilot Tracker</title><style>
+:root{font-family:system-ui,sans-serif;color:#29435c;background:#edf5fc}*{box-sizing:border-box}body{margin:0}header{padding:25px 18px;background:linear-gradient(120deg,#bddcf8,#e7dfff);text-align:center}h1{font-size:1.6rem;margin:0}h2{font-size:1.15rem}small,.muted{color:#657b91}main{max-width:850px;margin:auto;padding:14px}section{background:white;border-radius:18px;padding:17px;margin:14px 0;box-shadow:0 3px 18px #7896b51b}button,input,select,textarea{font:inherit;border-radius:10px;padding:10px;border:1px solid #c7d9e8;max-width:100%}button{background:#c3dff8;cursor:pointer;color:#244664;font-weight:600}button:active{background:#a5ccee}.danger{background:#ffe0e0}input[type=number]{width:95px}input[type=file]{width:100%}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}.zone{padding:12px 0;border-bottom:1px solid #edf1f7}.zone:last-child{border:0}.zone strong{display:block}progress{width:100%;height:14px;accent-color:#82b6e5}.tag{background:#e8f4ff;padding:4px 8px;border-radius:15px}#status{white-space:pre-wrap}.hidden{display:none}textarea{width:100%}footer{text-align:center;padding:20px}
+</style></head><body><header><h1>୨୧ Teyvat Pilot Tracker ୨୧</h1><p>Your journey, made a little easier ♡</p></header><main>
+<section><h2>♡ Choose profile</h2><div class="row"><select id="profile"></select><button id="addProfile">+ New client / profile</button><button id="removeProfile" class="danger">Delete profile</button></div><small>Profiles and progress are stored on this device. Never enter game passwords.</small></section>
+<section><h2>🗺️ Exploration progress</h2><div class="row"><input id="zoneName" placeholder="Zone name (e.g. Windrest Peak)" style="flex:1;min-width:180px"><input id="zonePct" type="number" min="0" max="100" placeholder="%"><button id="saveZone">Save zone</button></div><div id="zones"></div></section>
+<section><h2>📷 Scan screenshots (beta)</h2><p>Choose one or several screenshots. The scanner tries to read zone names and percentages. <b>Review every result before saving.</b></p><input type="file" id="images" accept="image/*" multiple><div class="row"><button id="scan">Scan screenshots</button></div><p id="status" class="muted"></p><div id="scanResults"></div><small>Text recognition needs internet to load the OCR library. Screenshots are processed in your browser; they are not uploaded by this site. Some labels may be missed or read incorrectly.</small></section>
+<section><h2>📈 Progress history</h2><div id="history"></div></section>
+<section><h2>💾 Backup</h2><div class="row"><button id="export">Export backup</button><label>Import backup <input type="file" id="import" accept=".json,application/json"></label></div><small>Export regularly. GitHub Pages does not sync data between devices automatically.</small></section>
+</main><footer>Made for Teyvat Pilots ♡</footer><script>
+const KEY='teyvat_tracker_v2';let data;try{data=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!data||!data.profiles)data={active:'personal',profiles:{personal:{name:'My Exploration',zones:{},history:[]}}};
+const $=id=>document.getElementById(id);const save=()=>localStorage.setItem(KEY,JSON.stringify(data));const profile=()=>data.profiles[data.active];const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(){if(!data.profiles[data.active])data.active=Object.keys(data.profiles)[0];$('profile').innerHTML=Object.entries(data.profiles).map(([id,p])=>'<option value="'+escapeHTML(id)+'">'+escapeHTML(p.name)+'</option>').join('');$('profile').value=data.active;
+$('zones').innerHTML=Object.entries(profile().zones).sort((a,b)=>a[0].localeCompare(b[0])).map(([name,pct])=>'<div class="zone"><strong>'+escapeHTML(name)+' <span class="tag">'+pct+'%</span></strong><progress value="'+pct+'" max="100"></progress><button data-edit="'+escapeHTML(name)+'">Edit</button> <button class="danger" data-delete="'+escapeHTML(name)+'">Remove</button></div>').join('')||'<p class="muted">No zones saved yet.</p>';
+$('history').innerHTML=profile().history.slice(-35).reverse().map(h=>'<p>• '+escapeHTML(h.date)+' — '+escapeHTML(h.name)+': '+(h.before===null?'New':h.before+'%')+' → '+h.after+'%</p>').join('')||'<p class="muted">No changes yet.</p>';save();}
+function setZone(name,pct){name=name.trim();pct=Number(pct);if(!name||!Number.isFinite(pct)||pct<0||pct>100)return false;const p=profile(),old=Object.prototype.hasOwnProperty.call(p.zones,name)?p.zones[name]:null;if(old!==pct){p.zones[name]=pct;p.history.push({date:new Date().toLocaleString(),name,before:old,after:pct});}render();return true;}
+$('saveZone').onclick=()=>{if(!setZone($('zoneName').value,$('zonePct').value))alert('Enter a valid zone and a percentage from 0 to 100.');else{$('zoneName').value='';$('zonePct').value='';}};
+$('zones').onclick=e=>{const n=e.target.dataset.edit||e.target.dataset.delete;if(!n)return;if(e.target.dataset.edit){$('zoneName').value=n;$('zonePct').value=profile().zones[n];window.scrollTo({top:0,behavior:'smooth'});}else if(confirm('Remove '+n+'?')){delete profile().zones[n];render();}};
+$('profile').onchange=e=>{data.active=e.target.value;render();};
+$('addProfile').onclick=()=>{const name=prompt('Profile or client name:');if(!name||!name.trim())return;const id='p'+Date.now();data.profiles[id]={name:name.trim(),zones:{},history:[]};data.active=id;render();};
+$('removeProfile').onclick=()=>{if(data.active==='personal'){alert('The personal profile cannot be deleted.');return;}if(confirm('Delete this profile and all its data?')){delete data.profiles[data.active];data.active='personal';render();}};
+$('export').onclick=()=>{const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=url;a.download='teyvat-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('import').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(!d.profiles||!d.profiles.personal)throw Error('Invalid backup');if(confirm('Replace all current tracker data with this backup?')){data=d;render();}}catch(err){alert('Could not import backup: '+err.message);}};
+const known=['Windrest Peak','Brightcrown Mountains','Starfell Valley','Windwail Highland','Galesong Hill','Bishui Plain','Minlin','Qiongji Estuary','Sea of Clouds','Lisha','The Chasm','Mt. Laixin','Chenyu Vale: Upper Vale','Chenyu Vale: Southern Mountain','Lokapala Jungle','Vissudha Field','Ashavan Realm','Ardravi Valley','Desert of Hadramaveth','Land of Lower Setekh','Land of Upper Setekh','Hypostyle Desert','Realm of Farakhkert','Gavireh Lajavard','Court of Fontaine Region','Erinnyes Forest','Morte Region','Beryl Region','Belleau Region','Liffey Region','Institute of Kinetic Energy Engineering Region','Nostoi Region','Ochkanatlan','Paha Isle','Lempo Isle','Hiisi Island','Ashveil Peak','Wavechaser Plain','Voidsea Outlook','Dunanna Pit','Everfrozen Earth','Flamefeather Valley','Volkodlak Tundra','Felifrost Peak','White Birch Snowgrave','Quahuacan Cliff','Tezcatepetonco Range','Basin of Unnumbered Flames','Tequemecan Valley','Coatepec Mountain','Toyac Springs','Atocpan'];
+function normalize(s){return s.toLowerCase().replace(/[^a-z0-9]/g,'');}
+function editDistance(a,b){const d=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){let last=d[0];d[0]=i;for(let j=1;j<=b.length;j++){let tmp=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,last+(a[i-1]===b[j-1]?0:1));last=tmp;}}return d[b.length];}
+function parseOCR(text){const lines=text.split(/\n/).map(s=>s.trim()).filter(Boolean),found=[];for(let i=0;i<lines.length;i++){const m=lines[i].match(/(?:Exploration\s*Progress\s*[:：]?\s*)(\d{1,3})\s*%/i);if(!m)continue;const pct=Number(m[1]);if(pct>100)continue;const before=lines.slice(Math.max(0,i-3),i).join(' ');const candidates=known.map(n=>({n,score:editDistance(normalize(before.slice(-n.length-12)),normalize(n))})).sort((a,b)=>a.score-b.score);const best=candidates[0];if(best&&best.score<=Math.max(5,Math.ceil(best.n.length*.4)))found.push({name:best.n,pct});}return found;}
+$('scan').onclick=async()=>{const files=Array.from($('images').files||[]);if(!files.length){alert('Select screenshots first.');return;}$('scan').disabled=true;$('scanResults').innerHTML='';$('status').textContent='Loading OCR...';try{if(!window.Tesseract){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';s.onload=resolve;s.onerror=()=>reject(Error('OCR library unavailable. Check internet connection.'));document.head.appendChild(s);});}const worker=await Tesseract.createWorker('eng');const all=[];try{for(let i=0;i<files.length;i++){$('status').textContent='Scanning '+(i+1)+' / '+files.length+'...';const r=await worker.recognize(files[i]);all.push(...parseOCR(r.data.text));}}finally{await worker.terminate();}const unique=new Map(all.map(x=>[x.name,x]));$('status').textContent=unique.size+' possible zones detected. Check each result; you can edit names and percentages.';if(!unique.size){$('scanResults').textContent='No reliable matches found. You can add zones manually above.';return;}$('scanResults').innerHTML=Array.from(unique.values()).map((v,i)=>'<div class="row"><input aria-label="Zone" class="detName" value="'+escapeHTML(v.name)+'" style="flex:1;min-width:140px"><input aria-label="Percent" class="detPct" type="number" min="0" max="100" value="'+v.pct+'"><label><input class="detCheck" type="checkbox" checked> Save</label></div>').join('')+'<button id="acceptScans">Save checked results</button>';$('acceptScans').onclick=()=>{let count=0;document.querySelectorAll('#scanResults .row').forEach(row=>{if(row.querySelector('.detCheck').checked&&setZone(row.querySelector('.detName').value,row.querySelector('.detPct').value))count++;});$('status').textContent=count+' zones saved.';};}catch(err){$('status').textContent='Scanner error: '+err.message;}finally{$('scan').disabled=false;}};
+render();
+</script></body></html>
