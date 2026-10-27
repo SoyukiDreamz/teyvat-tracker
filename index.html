@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teyvat Pilot Tracker</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #eaf3ff;
+  color: #344966;
+  padding: 20px;
+}
+main {
+  max-width: 600px;
+  margin: auto;
+}
+section {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  margin: 15px 0;
+}
+button {
+  background: #a9c8ed;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+}
+input { padding: 10px; max-width: 90%; }
+</style>
+</head>
+<body>
+<main>
+<h1>୨୧ Teyvat Pilot Tracker</h1>
+<p>Your journey, made a little easier ♡</p>
+
+<section>
+<h2>🌸 My Exploration</h2>
+<p>Track your personal Genshin progress.</p>
+</section>
+
+<section>
+<h2>🪽 Teyvat Pilots</h2>
+<p>Manage your clients and orders.</p>
+</section>
+
+<section>
+<h2>🗺️ Exploration Progress</h2>
+<label for="region">Region:</label>
+<input id="region" placeholder="Fontaine">
+<br><br>
+<label for="progress">Exploration %:</label>
+<input id="progress" type="number" min="0" max="100">
+<br><br>
+<button onclick="save()">Save Progress</button>
+<p id="result"></p>
+</section>
+</main>
+
+<script>
+function save() {
+  const region = document.getElementById("region").value;
+  const progress = document.getElementById("progress").value;
+  if (!region || progress === "" || Number(progress) < 0 || Number(progress) > 100) {
+    alert("Enter a region and a percentage between 0 and 100.");
+    return;
+  }
+  localStorage.setItem("region", region);
+  localStorage.setItem("progress", progress);
+  show();
+}
+function show() {
+  const region = localStorage.getItem("region");
+  const progress = localStorage.getItem("progress");
+  if (region !== null && progress !== null) {
+    document.getElementById("result").textContent =
+      region + ": " + progress + "%";
+  }
+}
+show();
+</script>
+</body>
+</html>
