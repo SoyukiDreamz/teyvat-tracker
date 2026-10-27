@@ -450,9 +450,19 @@ if(sessionStorage.getItem(key)==='yes')lock();
 const fields=['staffCustomer','staffAssigned','staffOrderNotes','staffPilotName','staffLogRegion','staffLogNotes'];
 let strikes=0,last=0;
 const gibberish=/^(.)\1{5,}$|^(?:asdf|qwer|zxcv|1234|abcd|testtest|lolol|aaaa|xxxx)/i;
-const inappropriate=/(?:\b(?:fuck(?:ing|er|ed|s)?|shit(?:ty|s)?|bitch(?:es)?|asshole(?:s)?|dick(?:head|s)?|cunt|slut|whore|motherfucker|idiot|moron|stupid|dumbass|imbecile|connard(?:e|s)?|connasse(?:s)?|salope(?:s)?|pute(?:s)?|putain|merde|encul[eé](?:e|s)?|fdp|tg|ntm|ta\s+gueule|ferme\s+ta\s+gueule)\b)/i;
+const inappropriate=/(?:\b(?:fuck(?:ing|er|ed|s)?|shit(?:ty|s)?|bitch(?:es)?|asshole(?:s)?|dick(?:head|s)?|cock|prick|wanker|twat|cunt|slut|whore|motherfucker|idiot|moron|stupid|dumbass|imbecile|jerk|jackass|loser|trash|connard(?:e|s)?|connasse(?:s)?|salope(?:s)?|pute(?:s)?|putain|merde|encul[eé](?:e|s)?|fdp|tg|ntm|abruti(?:e|s)?|cr[eé]tin(?:e|s)?|d[eé]bile|ta\s+gueule|ferme\s+ta\s+gueule)\b)/i;
 function nonsense(v){const t=String(v||'').trim();return inappropriate.test(t)||(t.length>=6&&(gibberish.test(t)||/^[^a-zA-ZÀ-ÿ0-9]{6,}$/.test(t)));}
 function warning(){const now=Date.now();if(now-last>10*60*1000)strikes=0;last=now;strikes++;if(strikes>=3)lock();else alert('☾ Please keep this workspace respectful and use meaningful information. Warning '+strikes+'/3.');}
 document.addEventListener('submit',e=>{if(!e.target.matches('#staffOrderForm,#staffLogForm'))return;const bad=fields.some(id=>{const el=document.getElementById(id);return el&&e.target.contains(el)&&nonsense(el.value)});if(!bad)return;e.preventDefault();e.stopImmediatePropagation();warning();},true);
 document.getElementById('staffSavePilot')?.addEventListener('click',e=>{if(!nonsense(document.getElementById('staffPilotName')?.value))return;e.preventDefault();e.stopImmediatePropagation();warning();},true);
+/* Catch clicks even if the browser blocks form submission due to missing required fields. */
+document.addEventListener('click',e=>{
+const button=e.target.closest('#staffOrderSubmit,#staffLogForm button[type="submit"],#staffLogForm input[type="submit"]');
+if(!button)return;
+const form=button.closest('form');if(!form)return;
+const bad=fields.some(id=>{const input=document.getElementById(id);return input&&form.contains(input)&&nonsense(input.value)});
+if(!bad)return;
+e.preventDefault();e.stopImmediatePropagation();warning();
+},true);
+
 })();</script></body></html>
