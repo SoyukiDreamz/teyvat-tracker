@@ -1,6 +1,27 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Teyvat Pilot Tracker</title><style>
-:root{font-family:system-ui,sans-serif;color:#29435c;background:#edf5fc}*{box-sizing:border-box}body{margin:0}header{padding:25px 18px;background:linear-gradient(120deg,#bddcf8,#e7dfff);text-align:center}h1{font-size:1.6rem;margin:0}h2{font-size:1.15rem}small,.muted{color:#657b91}main{max-width:850px;margin:auto;padding:14px}section{background:white;border-radius:18px;padding:17px;margin:14px 0;box-shadow:0 3px 18px #7896b51b}button,input,select,textarea{font:inherit;border-radius:10px;padding:10px;border:1px solid #c7d9e8;max-width:100%}button{background:#c3dff8;cursor:pointer;color:#244664;font-weight:600}button:active{background:#a5ccee}.danger{background:#ffe0e0}input[type=number]{width:95px}input[type=file]{width:100%}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}.zone{padding:12px 0;border-bottom:1px solid #edf1f7}.zone:last-child{border:0}.zone strong{display:block}progress{width:100%;height:14px;accent-color:#82b6e5}.tag{background:#e8f4ff;padding:4px 8px;border-radius:15px}#status{white-space:pre-wrap}.hidden{display:none}textarea{width:100%}footer{text-align:center;padding:20px}
-</style></head><body><header><h1>୨୧ Teyvat Pilot Tracker ୨୧</h1><p>Your journey, made a little easier ♡</p></header><main>
+:root{font-family:'Trebuchet MS',system-ui,sans-serif;color:#51456f;background:#fdf7ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 12%,#f9d9f5 0,transparent 32%),radial-gradient(circle at 90% 28%,#d9eaff 0,transparent 34%),linear-gradient(145deg,#fff9fe,#f4f2ff 60%,#eaf5ff);min-height:100vh}
+header{position:relative;overflow:hidden;padding:30px 16px 26px;text-align:center;background:linear-gradient(120deg,#d8e9ff 0%,#f6d6f2 50%,#cbd7ff 100%);border-bottom:3px solid #fff8ff}
+header:before,header:after{content:'✧  ☾  ✦  ♡  ✧';position:absolute;color:#fff9ff;font-size:27px;letter-spacing:20px;opacity:.75;pointer-events:none}header:before{top:14px;left:1%}header:after{bottom:10px;right:1%}
+h1{font-size:clamp(1.5rem,5vw,2.25rem);margin:8px 0 3px;color:#87548e;text-shadow:0 2px #fff;letter-spacing:.03em}
+h2{font-size:1.22rem;color:#9863a7;margin:0 0 12px}
+header p{color:#655a8c;font-style:italic;margin:6px}
+.logo-frame{width:min(280px,68vw);height:min(220px,54vw);margin:auto;display:grid;place-items:center;position:relative;filter:drop-shadow(0 10px 15px #7e75bc50)}
+.logo-frame img{width:100%;height:100%;object-fit:contain}
+.logo-fallback{font-size:clamp(2.3rem,9vw,4rem);color:#fff;text-shadow:0 2px 12px #b977ca,0 0 18px #9fb8fc}
+main{max-width:880px;margin:auto;padding:16px}
+section{background:#fffafdde;border:1px solid #f3d6ef;border-radius:22px;padding:19px;margin:17px 0;box-shadow:0 9px 26px #8e79b21a;backdrop-filter:blur(6px)}
+section:nth-child(even){border-color:#d9e3fc}
+button,input,select,textarea{font:inherit;border-radius:12px;padding:10px;border:1px solid #d9c9e8;max-width:100%;color:#554b71}
+button{background:linear-gradient(135deg,#f7c7e7,#d1dfff);cursor:pointer;color:#634b83;font-weight:700;box-shadow:0 3px 8px #cba7d22c}
+button:hover{filter:brightness(.98)}button:active{transform:translateY(1px)}button.danger{background:#ffe2ed}
+input,select,textarea{background:#fff}input[type=number]{width:95px}input[type=file]{width:100%}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.zone{padding:12px 0;border-bottom:1px dashed #e9d9f0}.zone:last-child{border:0}.zone strong{display:block;color:#65518b}
+progress{width:100%;height:14px;accent-color:#d69bda}.tag{background:#f9e4f7;padding:4px 8px;border-radius:15px;color:#9a5999}
+small,.muted{color:#857797}#status{white-space:pre-wrap}.hidden{display:none}textarea{width:100%}
+footer{text-align:center;padding:22px;color:#8f6d9e;font-style:italic}
+</style></head><body><header><div class="logo-frame"><img src="logo.png" alt="Teyvat Pilot logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logo-fallback" style="display:none">☾ 🪽 ✧</span></div><h1>୨୧ Teyvat Pilot Tracker ୨୧</h1><p>✧ A moonlit journey through Teyvat ✧</p></header><main>
 <section><h2>♡ Choose profile</h2><div class="row"><select id="profile"></select><button id="addProfile">+ New client / profile</button><button id="removeProfile" class="danger">Delete profile</button></div><small>Profiles and progress are stored on this device. Never enter game passwords.</small></section>
 <section><h2>🗺️ Exploration progress</h2><div class="row"><input id="zoneName" placeholder="Zone name (e.g. Windrest Peak)" style="flex:1;min-width:180px"><input id="zonePct" type="number" min="0" max="100" placeholder="%"><button id="saveZone">Save zone</button></div><div id="zones"></div></section>
 <section><h2>📷 Scan screenshots (beta)</h2><p>Choose one or several screenshots. The scanner tries to read zone names and percentages. <b>Review every result before saving.</b></p><input type="file" id="images" accept="image/*" multiple><div class="row"><button id="scan">Scan screenshots</button></div><p id="status" class="muted"></p><div id="scanResults"></div><small>Text recognition needs internet to load the OCR library. Screenshots are processed in your browser; they are not uploaded by this site. Some labels may be missed or read incorrectly.</small></section>
