@@ -1431,7 +1431,7 @@ function tracker(){try{const d=JSON.parse(localStorage.getItem(TRACK)||'{}');ret
 const DISCORD_CLIENT_ID='1564983874273026078',DISCORD_REDIRECT='https://soyukidreamz.github.io/teyvat-tracker/';
 const DISCORD_SESSION='teyvat_discord_profile_v1',DISCORD_PKCE='teyvat_discord_pkce_v1';
 let discordUser=null;try{discordUser=JSON.parse(sessionStorage.getItem(DISCORD_SESSION)||'null')}catch(e){}
-function b64url(bytes){return btoa(String.fromCharCode(...bytes)).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'')}
+function b64url(bytes){return btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 window.teyvatConnectDiscord=async function(){
  const status=document.getElementById('discordAccountStatus');
  if(!window.crypto||!window.crypto.subtle||!window.crypto.getRandomValues){status.textContent='Secure sign-in is not supported in this browser. Open the site over HTTPS.';throw new Error('Web Crypto unavailable')}
@@ -1463,7 +1463,7 @@ async function handleDiscordCallback(){
   if(!/^\\d{15,22}$/.test(String(u.id)))throw new Error('invalid user');
   discordUser={id:String(u.id),username:u.username,global_name:u.global_name||'',avatar:u.avatar||'',connectedAt:Date.now()};
   sessionStorage.setItem(DISCORD_SESSION,JSON.stringify(discordUser));
- }catch(e){sessionStorage.setItem('teyvat_discord_login_error','Discord could not finish signing in. Check your OAuth2 redirect URL and try again.')}
+ }catch(e){sessionStorage.setItem('teyvat_discord_login_error','Discord authorization succeeded, but the site could not fetch your profile. The browser may have blocked the token request. Please try again in the same browser.')}
 }
 function discordAvatar(u){return u?.avatar?'https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=256':null}
 function updateDiscord(){
