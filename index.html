@@ -1443,17 +1443,6 @@ window.teyvatConnectDiscord=async function(){
  status.textContent='Redirecting to Discord…';
  window.location.href=authorizeUrl;
 };
-async function handleDiscordCallback()
- const status=document.getElementById('discordAccountStatus');
- if(!window.crypto||!window.crypto.subtle||!window.crypto.getRandomValues){status.textContent='Secure sign-in is not supported in this browser. Open the site over HTTPS.';throw new Error('Web Crypto unavailable')}
- const verifier=b64url(window.crypto.getRandomValues(new Uint8Array(48))),nonce=b64url(window.crypto.getRandomValues(new Uint8Array(24)));
- const challenge=b64url(new Uint8Array(await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))));
- sessionStorage.setItem(DISCORD_PKCE,JSON.stringify({verifier,nonce,created:Date.now(),returnPage:new URLSearchParams(location.search).get('page')||'home'}));
- const params=new URLSearchParams({client_id:DISCORD_CLIENT_ID,redirect_uri:DISCORD_REDIRECT,response_type:'code',scope:'identify',state:nonce,code_challenge:challenge,code_challenge_method:'S256'});
- const authorizeUrl='https://discord.com/oauth2/authorize?'+params.toString();
- status.textContent='Redirecting to Discord…';
- window.location.href=authorizeUrl;
-}
 async function handleDiscordCallback(){
  const url=new URL(location.href),code=url.searchParams.get('code'),error=url.searchParams.get('error'),nonce=url.searchParams.get('state');
  if(!code&&!error)return;
