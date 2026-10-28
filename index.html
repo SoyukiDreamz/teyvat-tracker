@@ -1442,7 +1442,7 @@ window.teyvatConnectDiscord=async function(){
  const authorizeUrl='https://discord.com/oauth2/authorize?'+params.toString();
  status.textContent='Redirecting to Discord…';
  window.location.href=authorizeUrl;
-}
+};
 async function handleDiscordCallback()
  const status=document.getElementById('discordAccountStatus');
  if(!window.crypto||!window.crypto.subtle||!window.crypto.getRandomValues){status.textContent='Secure sign-in is not supported in this browser. Open the site over HTTPS.';throw new Error('Web Crypto unavailable')}
