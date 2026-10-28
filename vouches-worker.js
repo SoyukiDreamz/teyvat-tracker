@@ -41,19 +41,21 @@ export default {
       }
       let body;
       try { body = await request.json(); } catch (_) { return json({ error: "Invalid JSON" }, 400, origin); }
-      const messageId = String(body.message_id || "");
-      if (!/^\d{15,22}$/.test(messageId)) return json({ error: "Invalid message_id" }, 400, origin);
-      const action = body.action === "delete" ? "delete" : "upsert";
+      const event = String(body.event || "");
+      const vouch = body.vouch && typeof body.vouch === "object" ? body.vouch : body;
+      const messageId = String(vouch.id || body.id || body.message_id || "");
+      if (!/^\d{15,22}$/.test(messageId)) return json({ error: "Invalid message id" }, 400, origin);
+      const action = event === "vouch.deleted" || body.action === "delete" ? "delete" : "upsert";
       if (action === "delete") {
         await env.DB.prepare("UPDATE vouches SET is_deleted = 1 WHERE message_id = ?").bind(messageId).run();
         return json({ ok: true, action, message_id: messageId }, 200, origin);
       }
-      const content = String(body.content || "").trim().slice(0, 4000);
+      const content = String(vouch.content || "").trim().slice(0, 4000);
       if (!content) return json({ ok: true, ignored: true, reason: "empty content" }, 200, origin);
-      const authorId = String(body.author_id || "").slice(0, 32);
-      const authorName = String(body.author_name || "Traveler").slice(0, 100);
-      const avatarUrl = String(body.avatar_url || "").slice(0, 500);
-      const createdAt = String(body.created_at || new Date().toISOString()).slice(0, 40);
+      const authorId = String(vouch.author_id || "").slice(0, 32);
+      const authorName = String(vouch.author_name || "Traveler").slice(0, 100);
+      const avatarUrl = String(vouch.avatar_url || vouch.avatar || "").slice(0, 500);
+      const createdAt = String(vouch.created_at || new Date().toISOString()).slice(0, 40);
       await env.DB.prepare(
         "INSERT INTO vouches (message_id, author_id, author_name, avatar_url, content, created_at, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0) ON CONFLICT(message_id) DO UPDATE SET author_id=excluded.author_id, author_name=excluded.author_name, avatar_url=excluded.avatar_url, content=excluded.content, created_at=excluded.created_at, is_deleted=0"
       ).bind(messageId, authorId, authorName, avatarUrl, content, createdAt).run();
