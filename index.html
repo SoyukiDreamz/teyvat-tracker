@@ -912,6 +912,26 @@ body[data-page="tips"] main [data-view="tips"]{display:block!important}
 #teyvatTips .tips-check-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-top:14px}
 #teyvatTips .tips-check-footer button{border:1px solid #d5b1d7;border-radius:12px;padding:8px 12px;background:#f3e0f2;color:#643d69;cursor:pointer}
 #teyvatTips .tips-note{text-align:center;font-size:12px;margin-top:20px}
+
+/* Moonlight avatar collection */
+#moonExtrasPanel .moon-avatar-preview{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:12px 0}
+#moonExtrasPanel .moon-avatar-frame{--frame-color:#fff;position:relative;display:grid;place-items:center;flex:0 0 108px;width:108px;height:108px;border-radius:50%;background:#3b294c;isolation:isolate;border:5px solid var(--frame-color);box-shadow:0 0 0 3px #2b1938,0 0 15px var(--frame-color);overflow:visible}
+#moonExtrasPanel .moon-avatar-frame img{width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;inset:0}
+#moonExtrasPanel .moon-avatar-frame span{font-size:48px;color:#fff}
+#moonExtrasPanel .moon-avatar-frame:after{content:'✧';position:absolute;right:-9px;top:-15px;color:var(--frame-color);font-size:29px;text-shadow:0 0 7px var(--frame-color)}
+#moonExtrasPanel .frame-rose{--frame-color:#f99ac9;border-style:double;border-width:8px}
+#moonExtrasPanel .frame-moon{--frame-color:#d4b4ff;border-style:ridge}
+#moonExtrasPanel .frame-stars{--frame-color:#fff3a6;border-style:dotted}
+#moonExtrasPanel .frame-frost{--frame-color:#9deaff;border-style:double;border-width:8px}
+#moonExtrasPanel .frame-gold{--frame-color:#ffd27a;border-style:groove;border-width:8px}
+#moonExtrasPanel .frame-butterfly{--frame-color:#b3a3ff;border-style:dashed}
+#moonExtrasPanel .frame-galaxy{--frame-color:#f4a4ff;border-style:double;border-width:8px;box-shadow:0 0 0 3px #2b1938,0 0 14px #ef9bff,0 0 25px #88baff}
+#moonExtrasPanel .moon-avatar-options{flex:1;min-width:175px}
+#moonExtrasPanel .moon-avatar-options input{width:100%;max-width:240px;font-size:11px}
+#moonExtrasPanel .moon-avatar-options small{display:block;color:#ffe0f5;font-size:10px;line-height:1.5}
+#moonExtrasPanel .moon-frame-choice{margin:4px!important}
+#moonExtrasPanel .moon-frame-choice[aria-pressed=true]{background:#a05388!important}
+#moonExtrasPanel .moon-frame-choice:disabled{opacity:.5;cursor:not-allowed}
 </style></head><body class="locked"><div class="floating-colombina chibi-1" aria-hidden="true"><img src="colombina1.webp" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div><div class="floating-colombina chibi-2" aria-hidden="true"><img src="colombina2.webp" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div><div class="floating-colombina chibi-3" aria-hidden="true"><img src="colombina3.webp" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div><div class="floating-colombina chibi-4" aria-hidden="true"><img src="colombina4.webp" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div><div class="floating-colombina chibi-5" aria-hidden="true"><img src="colombina5.webp" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div><div class="floating-colombina chibi-6" aria-hidden="true"><img src="colombina6.webp" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div><div class="floating-colombina chibi-7" aria-hidden="true"><img src="colombina7.webp" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div><script>(function(){try{const d=JSON.parse(localStorage.getItem('teyvat_moon_extras_v1')||'{}');const t=d.theme==='colombina'?'pink':d.theme;if(['pink','black','wine','blue','white','lavender'].includes(t))document.body.dataset.moonTheme=t;else document.body.dataset.moonTheme='pink'}catch(e){document.body.dataset.moonTheme='pink'}})();</script><div id="staffGate" aria-label="Staff entry"><div class="gate-card"><img src="logo.png" alt="Teyvat Pilots logo"><h2>☾ Welcome, Traveler ♡</h2><p>✧ Enter the moonlit password to begin your journey through Teyvat. ✧</p><form id="gateForm"><input id="gatePassword" type="password" placeholder="Your staff password" autocomplete="off" required aria-label="Staff password"><div class="moon-challenge" aria-label="Moonlight verification"><img src="logo.png" alt="Colombina-inspired Teyvat Pilots artwork"><p>✧ Moonlight check ✧<br><small>Tap the moon to continue</small></p><div class="moon-choices"><button type="button" data-moon-choice="star" aria-label="Star">✦</button><button type="button" data-moon-choice="moon" aria-label="Moon">☾</button><button type="button" data-moon-choice="heart" aria-label="Heart">♡</button></div><p id="moonStatus" aria-live="polite">Choose the moon above ♡</p></div><button type="submit">🪽 Enter Teyvat</button><p id="gateError" role="alert"></p></form><small>୨୧ Teyvat Pilots ୨୧</small></div></div><header><div class="logo-frame"><img src="logo.png" alt="Teyvat Pilot logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logo-fallback" style="display:none">☾ 🪽 ✧</span></div><h1>୨୧ Teyvat Pilot Tracker ୨୧</h1><p>✧ A moonlit journey through Teyvat ✧</p></header><nav id="moonNav" aria-label="Choose a Teyvat page"><a class="moon-cloud-button" href="?page=home" data-page-link="home"><img class="kuuhenki-art kuuhenki-photo" src="Kuuhenki.png" alt="" loading="eager" decoding="async"><strong>Home</strong></a><a class="moon-cloud-button" href="?page=exploration" data-page-link="exploration"><img class="kuuhenki-art kuuhenki-photo" src="Kuuhenki.png" alt="" loading="eager" decoding="async"><strong>Exploration</strong></a><a class="moon-cloud-button" href="?page=map" data-page-link="map"><img class="kuuhenki-art kuuhenki-photo" src="Kuuhenki.png" alt="" loading="eager" decoding="async"><strong>Teyvat Map</strong></a><a class="moon-cloud-button" href="?page=orders" data-page-link="orders"><img class="kuuhenki-art kuuhenki-photo" src="Kuuhenki.png" alt="" loading="eager" decoding="async"><strong>Orders</strong></a><a class="moon-cloud-button" href="?page=pilots" data-page-link="pilots"><img class="kuuhenki-art kuuhenki-photo" src="Kuuhenki.png" alt="" loading="eager" decoding="async"><strong>Pilots</strong></a><a class="moon-cloud-button" href="?page=tips" data-page-link="tips"><img class="kuuhenki-art kuuhenki-photo" src="Kuuhenki.png" alt="" loading="eager" decoding="async"><strong>Tips</strong></a></nav><main><section id="teyvatTips" data-view="tips">
 <div class="tips-intro"><span class="tips-eyebrow">✧ Moonlit Traveler's Guide ✧</span><h2>☾ Teyvat Tips & Tricks ♡</h2><p>Smart ways to earn Primogems, explore faster, and prepare your characters — without cheats, account-sharing, or risky shortcuts.</p></div>
 <div class="tips-tabs" role="group" aria-label="Filter tips"><button type="button" data-tips-filter="all" aria-pressed="true">✧ All</button><button type="button" data-tips-filter="primos" aria-pressed="false">💎 Primogems</button><button type="button" data-tips-filter="explore" aria-pressed="false">🗺️ Exploration</button><button type="button" data-tips-filter="build" aria-pressed="false">⚔️ Characters</button></div>
@@ -1376,18 +1396,37 @@ renderClients();
 })();</script><script>(function(){const wrap=document.getElementById('mapFrameWrap'),expand=document.getElementById('mapExpand'),close=document.getElementById('mapCloseExpand'),focus=document.getElementById('mapFocus');if(!wrap)return;function setExpanded(v){wrap.classList.toggle('is-expanded',v);document.body.classList.toggle('map-fullscreen',v);expand.textContent=v?'✕ Close full map':'⛶ Expand map'}expand.addEventListener('click',()=>setExpanded(!wrap.classList.contains('is-expanded')));close.addEventListener('click',()=>setExpanded(false));focus.addEventListener('click',()=>wrap.scrollIntoView({behavior:'smooth',block:'start'}));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&wrap.classList.contains('is-expanded'))setExpanded(false)});})();</script>
 <script>(function(){
 const KEY='teyvat_moon_interactions_v1',TRACK='teyvat_tracker_v2';
-let state={title:'Moonlit Traveler',icon:'☾',giftDay:'',gifts:0};
+let state={title:'Moonlit Traveler',icon:'☾',giftDay:'',gifts:0,frames:['classic'],frame:'classic',avatar:''};
 try{state={...state,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){}
-const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state));return true}catch(e){alert('Storage is full. Try a smaller profile picture.');return false}};
 const panel=document.createElement('section');panel.id='moonExtrasPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Secret Moonlight Room');
-panel.innerHTML='<div class="moon-actions"><h2>☾ Secret Moonlight Room</h2><button id="moonClose" aria-label="Close room">✕</button></div><p>✧ A little place between the stars, just for travelers. ✧</p><h3>♡ Daily Moonlight Gift</h3><button id="moonGift">🎁 Open today\'s gift</button><p id="moonGiftInfo"></p><h3>✧ Your moonlit identity</h3><label>Title <select id="moonTitle"><option>Moonlit Traveler</option><option>Star Collector</option><option>Dream Wanderer</option><option>Moon Guardian</option></select></label><label> Icon <select id="moonIcon"><option>☾</option><option>♡</option><option>✦</option><option>🦋</option></select></label><p id="moonIdentity"></p><h3>✧ Exploration achievements</h3><div id="moonBadges"></div><p>Achievements use the exploration progress saved in this browser. Decorations are website-only rewards.</p>';
+panel.innerHTML='<div class="moon-actions"><h2>☾ Secret Moonlight Room</h2><button id="moonClose" aria-label="Close room">✕</button></div><p>✧ A little place between the stars, just for travelers. ✧</p><h3>♡ Daily Moonlight Gift</h3><button id="moonGift">🎁 Open today\'s gift</button><p id="moonGiftInfo"></p><h3>✧ Your moonlit identity</h3><label>Title <select id="moonTitle"><option>Moonlit Traveler</option><option>Star Collector</option><option>Dream Wanderer</option><option>Moon Guardian</option></select></label><label> Icon <select id="moonIcon"><option>☾</option><option>♡</option><option>✦</option><option>🦋</option></select></label><p id="moonIdentity"></p><h3>♡ Profile picture & frames</h3><div class="moon-avatar-preview"><div id="moonAvatarFrame" class="moon-avatar-frame frame-classic"><img id="moonAvatarImage" alt="Your profile picture" hidden><span id="moonAvatarFallback" aria-hidden="true">☾</span></div><div class="moon-avatar-options"><label for="moonAvatarUpload">Choose a profile picture</label><input type="file" id="moonAvatarUpload" accept="image/png,image/jpeg,image/webp,image/gif"><button type="button" id="moonAvatarRemove">Remove picture</button><small>Saved only on this device. Animated GIF uploads become a still image.</small></div></div><p id="moonAvatarStatus" aria-live="polite"></p><h3>✧ Your frame collection</h3><div id="moonFrameList"></div><p>Open your daily Moonlight Gift to unlock a random new frame. Choose any unlocked frame to wear it!</p><h3>✧ Exploration achievements</h3><div id="moonBadges"></div><p>Achievements use the exploration progress saved in this browser. Decorations are website-only rewards.</p>';
 const btn=document.createElement('button');btn.id='moonExtrasButton';btn.textContent='☾ Moonlight Room';btn.setAttribute('aria-label','Open secret Moonlight Room');
 document.body.append(btn,panel);
 const $=id=>document.getElementById(id);
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 function tracker(){try{const d=JSON.parse(localStorage.getItem(TRACK)||'{}');return d.profiles?.[d.active]?.zones||{}}catch(e){return {}}}
+const FRAME_NAMES={classic:'♡ Classic',rose:'🌹 Rose Petals',moon:'☾ Moonlight',stars:'✦ Starlight',frost:'❄ Frost',gold:'♛ Golden Crown',butterfly:'🦋 Butterfly',galaxy:'✧ Galaxy'};
+function updateAvatar(){
+ if(!Array.isArray(state.frames))state.frames=['classic'];
+ if(!state.frames.includes('classic'))state.frames.unshift('classic');
+ if(!state.frames.includes(state.frame))state.frame='classic';
+ const img=$('moonAvatarImage'),fallback=$('moonAvatarFallback'),frame=$('moonAvatarFrame');
+ img.hidden=!state.avatar;fallback.hidden=!!state.avatar;
+ if(state.avatar)img.src=state.avatar;else img.removeAttribute('src');
+ fallback.textContent=state.icon||'☾';
+ frame.className='moon-avatar-frame frame-'+state.frame;
+ const list=$('moonFrameList');list.replaceChildren();
+ Object.entries(FRAME_NAMES).forEach(([id,name])=>{
+  const unlocked=state.frames.includes(id),button=document.createElement('button');
+  button.type='button';button.className='moon-frame-choice';button.textContent=(unlocked?(state.frame===id?'✓ ':''):'🔒 ')+name;
+  button.disabled=!unlocked;button.setAttribute('aria-pressed',String(state.frame===id));
+  if(unlocked)button.onclick=()=>{state.frame=id;save();updateAvatar()};
+  list.append(button);
+ });
+}
 function update(){
- $('moonTitle').value=state.title;$('moonIcon').value=state.icon;
+ $('moonTitle').value=state.title;$('moonIcon').value=state.icon;updateAvatar();
  $('moonIdentity').textContent=state.icon+' '+state.title+' · '+state.gifts+' moonlight gifts collected';
  $('moonGift').disabled=state.giftDay===today();$('moonGiftInfo').textContent=state.giftDay===today()?'♡ Your moonlight gift has been opened today. Come back tomorrow!':'☾ A small surprise awaits.';
  const values=Object.values(tracker()).map(Number).filter(Number.isFinite),completed=values.filter(x=>x===100).length;
@@ -1400,7 +1439,21 @@ btn.onclick=open;$('moonClose').onclick=close;
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden)close()});
 $('moonTitle').onchange=e=>{state.title=e.target.value;save();update()};
 $('moonIcon').onchange=e=>{state.icon=e.target.value;save();update()};
-$('moonGift').onclick=()=>{if(state.giftDay===today())return;state.giftDay=today();state.gifts++;save();update();showWhisper('✧ A little starlight for you, '+state.title+'. ♡')};
+$('moonGift').onclick=()=>{if(state.giftDay===today())return;state.giftDay=today();state.gifts++;if(!Array.isArray(state.frames))state.frames=['classic'];const remaining=Object.keys(FRAME_NAMES).filter(id=>!state.frames.includes(id));let message;if(remaining.length){const won=remaining[Math.floor(Math.random()*remaining.length)];state.frames.push(won);state.frame=won;message='✧ New profile frame unlocked: '+FRAME_NAMES[won]+'! ♡'}else{message='✧ You already collected every frame! Moonlight shines on you. ♡'}save();update();$('moonGiftInfo').textContent=message;showWhisper(message)};
+$('moonAvatarRemove').onclick=()=>{state.avatar='';save();updateAvatar();$('moonAvatarStatus').textContent='Profile picture removed.'};
+$('moonAvatarUpload').onchange=async e=>{
+ const file=e.target.files[0];if(!file)return;
+ if(!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)){ $('moonAvatarStatus').textContent='Choose a PNG, JPG, WEBP, or GIF image.';return }
+ if(file.size>12*1024*1024){$('moonAvatarStatus').textContent='Choose an image smaller than 12 MB.';return}
+ const url=URL.createObjectURL(file),img=new Image();
+ try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});
+ const canvas=document.createElement('canvas'),size=240;canvas.width=canvas.height=size;
+ const ctx=canvas.getContext('2d'),scale=Math.max(size/img.width,size/img.height),w=img.width*scale,h=img.height*scale;
+ ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+ const old=state.avatar;state.avatar=canvas.toDataURL('image/jpeg',.83);
+ if(!save()){state.avatar=old;return}updateAvatar();$('moonAvatarStatus').textContent='Your profile picture has been saved on this device. ♡';
+ }catch(err){$('moonAvatarStatus').textContent='Could not read this image.'}finally{URL.revokeObjectURL(url);e.target.value=''}
+};
 function showWhisper(msg){const box=$('colombinaWhisper');if(box){box.querySelector('.whisper-message').textContent=msg;box.classList.add('visible');setTimeout(()=>box.classList.remove('visible'),6500)}}
 const perch=document.querySelector('.moon-player-scene .colombina-perch');let clicks=0;
 if(perch){perch.setAttribute('title','Tap Colombina for a little secret');perch.setAttribute('aria-hidden','false');perch.setAttribute('role','button');perch.setAttribute('tabindex','0');const react=()=>{clicks++;showWhisper(clicks%5===0?'☾ You found a little secret. The moon is listening. ♡':['✧ A wish upon a star.','♡ Welcome, little traveler.','☾ The night feels peaceful.'][clicks%3]);if(clicks%5===0)open()};perch.addEventListener('click',react);perch.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();react()}})}
