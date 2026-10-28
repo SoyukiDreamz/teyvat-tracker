@@ -760,16 +760,20 @@ render();
 const gate=document.getElementById('staffGate'),form=document.getElementById('gateForm'),field=document.getElementById('gatePassword'),err=document.getElementById('gateError');
 const password='LunaireWings#2709';
 let moonVerified=false;document.querySelectorAll('[data-moon-choice]').forEach(btn=>btn.addEventListener('click',()=>{moonVerified=btn.dataset.moonChoice==='moon';document.querySelectorAll('[data-moon-choice]').forEach(b=>b.classList.toggle('chosen',moonVerified&&b===btn));document.getElementById('moonStatus').textContent=moonVerified?'✓ Moonlight verified! ♡':'Not quite — find the crescent moon ✧';err.textContent='';}));
-const accessKey='teyvat_gate_sessions_v2',attemptKey='teyvat_gate_wrong_v2',sessionKey='teyvat_gate_session_started_v2';
+const accessKey='teyvat_gate_sessions_v2',attemptKey='teyvat_gate_wrong_v2',sessionKey='teyvat_gate_session_started_v2',lastVisitKey='teyvat_gate_last_visit_v1',inactiveLimit=21*24*60*60*1000;
 const help=document.createElement('div');help.id='gateHelp';help.hidden=true;help.style.cssText='padding:14px;border:1px solid #d7c4ed;border-radius:15px;margin-top:12px;background:#f6ecff;color:#49345b;line-height:1.55';help.innerHTML='<strong>☾ Need help entering Teyvat?</strong><p>Five password attempts were unsuccessful. You can ask the owner for help through the Teyvat Pilots Discord server.</p><p><a href="https://discord.gg/4ZSudTMcA7" target="_blank" rel="noopener noreferrer" style="color:#6a4396;font-weight:bold">✧ Join the Teyvat Pilots Discord ↗</a></p><p>Once you join, look for the server owner with the Discord username <strong>s0yukudreamzs</strong> (display name: Soyuki). Open their profile and select Message to send a private DM, if their privacy settings allow it.</p><small>Never share your password in a DM.</small>';form.append(help);
 let failed=0;try{failed=Number(localStorage.getItem(attemptKey)||0)}catch(e){}
 function showHelp(){help.hidden=failed<5}
-function unlock(){document.body.classList.remove('locked');gate.hidden=true;gate.style.display='none';try{localStorage.setItem('teyvat_staff_gate_unlocked','yes');localStorage.setItem(attemptKey,'0');sessionStorage.setItem('teyvat_staff_gate','yes');failed=0}catch(e){}}
+function unlock(){document.body.classList.remove('locked');gate.hidden=true;gate.style.display='none';try{localStorage.setItem('teyvat_staff_gate_unlocked','yes');localStorage.setItem(attemptKey,'0');sessionStorage.setItem('teyvat_staff_gate','yes');localStorage.setItem(lastVisitKey,String(Date.now()));failed=0}catch(e){}}
 try{
  let visits=Number(localStorage.getItem(accessKey)||0);
+ const now=Date.now(),last=Number(localStorage.getItem(lastVisitKey)||0);
+ const inactive=last>0&&now-last>=inactiveLimit;
  if(!sessionStorage.getItem(sessionKey)){visits++;localStorage.setItem(accessKey,String(visits));sessionStorage.setItem(sessionKey,'yes')}
- if(visits>=6){localStorage.removeItem('teyvat_staff_gate_unlocked');sessionStorage.removeItem('teyvat_staff_gate');localStorage.setItem(accessKey,'1')}
- else if(localStorage.getItem('teyvat_staff_gate_unlocked')==='yes'||sessionStorage.getItem('teyvat_staff_gate')==='yes')unlock();
+ if(inactive){localStorage.removeItem('teyvat_staff_gate_unlocked');sessionStorage.removeItem('teyvat_staff_gate');localStorage.setItem(accessKey,'1');err.textContent='Welcome back! Please enter your password after 3 weeks away. ♡'}
+ if(!inactive&&visits>=6){localStorage.removeItem('teyvat_staff_gate_unlocked');sessionStorage.removeItem('teyvat_staff_gate');localStorage.setItem(accessKey,'1')}
+ else if(!inactive&&(localStorage.getItem('teyvat_staff_gate_unlocked')==='yes'||sessionStorage.getItem('teyvat_staff_gate')==='yes'))unlock();
+ if(!inactive)localStorage.setItem(lastVisitKey,String(now));
 }catch(e){}
 showHelp();
 form.addEventListener('submit',function(e){e.preventDefault();if(!moonVerified){err.textContent='Complete the moonlight check first ♡';return;}if(field.value===password){unlock();field.value='';err.textContent='';}else{failed++;try{localStorage.setItem(attemptKey,String(failed))}catch(e){}err.textContent=failed>=5?'That password is incorrect. Contact the owner for help below.':'That password is not quite right. Try again ♡ ('+failed+'/5)';showHelp();field.select();}});
