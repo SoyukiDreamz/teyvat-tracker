@@ -192,6 +192,29 @@ body[data-moon-theme] progress{accent-color:var(--theme-accent)}
 body[data-moon-theme] #musicWidget{background:linear-gradient(120deg,var(--theme-soft),var(--theme-main))!important;border-color:var(--theme-border)!important}
 body[data-moon-theme] footer{color:var(--theme-text)}
 
+
+/* Columbina's LEAVE: thin, blood-red sinister lettering. */
+@import url('https://fonts.googleapis.com/css2?family=Special+Elite&display=swap');
+#judgmentLeave{
+ font-family:'Special Elite','Courier New',serif!important;
+ font-weight:400!important;
+ font-style:normal!important;
+ font-stretch:condensed!important;
+ letter-spacing:.025em!important;
+ color:#b20d22!important;
+ -webkit-text-stroke:.35px #710714!important;
+ text-shadow:0 0 5px #d20a24aa,0 0 18px #8b001c88!important;
+ filter:none!important;
+}
+#judgmentLeave:before,#judgmentLeave:after{
+ font-family:inherit!important;
+ font-weight:400!important;
+ -webkit-text-stroke:.25px currentColor!important;
+ text-shadow:0 0 5px currentColor!important;
+}
+#judgmentLeave.visible:before{color:#e34b59!important;opacity:.38!important}
+#judgmentLeave.visible:after{color:#5e0715!important;opacity:.28!important}
+
 /* LEAVE alone: torn, scratched, chromatic-glitch lettering. */
 #judgmentLeave{isolation:isolate;overflow:hidden;font-family:Impact,'Arial Black',sans-serif!important;font-stretch:condensed;font-style:italic;letter-spacing:-.025em!important;color:#eac1df!important;-webkit-text-stroke:2px #283c73!important;text-shadow:-5px 0 #76d7ff,5px 2px #a34f9c,0 0 20px #7fbaf5,0 0 50px #252c6f!important;filter:contrast(1.5)}
 #judgmentLeave.visible{animation:judgmentShake .075s steps(2,end) infinite,judgmentFlicker .31s steps(2,end) infinite}
