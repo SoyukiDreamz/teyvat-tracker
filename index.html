@@ -1613,29 +1613,36 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
 </script>
 <script>
 (function(){
- const API=''; // Set this to the deployed vouches Worker URL once backend is live.
+ const API='https://script.google.com/macros/s/AKfycbyci52dGRAtLt8eUP36lXkLA5ybP0tQcjOOS67E8HgoX4Pr92bbkDdXxItatlHchu13kw/exec';
  const count=document.getElementById('vouchesCount'),status=document.getElementById('vouchesStatus'),list=document.getElementById('vouchesList');
  if(!count||!status||!list)return;
- if(!API){count.textContent='—';return;}
  function render(data){
   const items=Array.isArray(data.vouches)?data.vouches:[];
-  count.textContent=String(Number.isFinite(data.count)?data.count:items.length);
+  count.textContent=String(Number.isFinite(Number(data.total))?Number(data.total):items.length);
   list.replaceChildren();
-  if(!items.length){status.textContent='No vouches yet — when travelers post in #vouche, approved reviews will appear here.';return;}
-  status.textContent='✧ '+items.length+' recent vouches from our travelers ✧';
+  if(!items.length){status.textContent='No vouches yet — be the first Traveler to share your experience in #vouche!';return;}
+  status.textContent='✧ '+items.length+' vouches from our Travelers ✧';
   items.forEach(v=>{
    const card=document.createElement('article');card.className='vouch-card';
    const author=document.createElement('div');author.className='vouch-author';
-   if(v.avatar_url){const img=document.createElement('img');img.src=v.avatar_url;img.alt='';img.loading='lazy';author.append(img);}
    const identity=document.createElement('div'),name=document.createElement('strong'),date=document.createElement('div');
-   name.textContent=String(v.author_name||'Traveler');date.className='vouch-date';
-   const d=new Date(v.created_at);date.textContent=Number.isNaN(d.getTime())?'':d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
-   identity.append(name,date);author.append(identity);
-   const message=document.createElement('p');message.className='vouch-message';message.textContent=String(v.content||'');
-   card.append(author,message);list.append(card);
+   name.textContent=String(v.author||'Traveler');date.className='vouch-date';
+   const d=new Date(v.date);date.textContent=Number.isNaN(d.getTime())?'':d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});
+   identity.append(name,date);author.append(identity);card.append(author);
+   if(v.pilot){const pilot=document.createElement('p');pilot.className='vouch-pilot';pilot.textContent='Pilot: '+String(v.pilot);card.append(pilot);}
+   const message=document.createElement('p');message.className='vouch-message';message.textContent=String(v.message||'');
+   card.append(message);
+   if(v.url){const link=document.createElement('a');link.href=String(v.url);link.target='_blank';link.rel='noopener noreferrer';link.textContent='View Discord message ↗';link.className='vouch-link';card.append(link);}
+   list.append(card);
   });
  }
- async function load(){try{const r=await fetch(API.replace(/\/$/,'')+'/vouches',{headers:{Accept:'application/json'}});if(!r.ok)throw new Error('HTTP '+r.status);render(await r.json());}catch(e){status.textContent='The vouches service is temporarily unavailable. Please try again later.';}}
+ async function load(){
+  try{
+   const r=await fetch(API,{method:'GET',headers:{Accept:'application/json'},cache:'no-store'});
+   if(!r.ok)throw new Error('HTTP '+r.status);
+   const data=await r.json();render(data);
+  }catch(e){status.textContent='The vouches service could not be reached. Please refresh and try again.';}
+ }
  load();setInterval(load,60000);
 })();
 </script>
