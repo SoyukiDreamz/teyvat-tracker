@@ -1617,8 +1617,13 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
  const count=document.getElementById('vouchesCount'),status=document.getElementById('vouchesStatus'),list=document.getElementById('vouchesList');
  if(!count||!status||!list)return;
  function render(data){
-  const items=Array.isArray(data.vouches)?data.vouches:[];
-  count.textContent=String(Number.isFinite(Number(data.total))?Number(data.total):items.length);
+  const allItems=Array.isArray(data.vouches)?data.vouches:[];
+  // Keep the public vouch list for clients only; hide the server owner's own posts.
+  const items=allItems.filter(v=>{
+   const author=String(v.author||'').trim().toLowerCase();
+   return author!=='soyuki'&&!author.includes('s0yukudreamzs');
+  });
+  count.textContent=String(items.length);
   list.replaceChildren();
   if(!items.length){status.textContent='No vouches yet — be the first Traveler to share your experience in #vouche!';return;}
   status.textContent='✧ '+items.length+' vouches from our Travelers ✧';
