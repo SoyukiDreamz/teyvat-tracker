@@ -1621,7 +1621,11 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   // Keep the public vouch list for clients only; hide the server owner's own posts.
   const items=allItems.filter(v=>{
    const author=String(v.author||'').trim().toLowerCase();
-   return author!=='soyuki'&&!author.includes('s0yukudreamzs');
+   const message=String(v.message||'');
+   // A real customer vouch must mention the pilot in Discord.
+   const mentionsPilot=/<@!?\d+>/.test(message);
+   const isOwner=author==='soyuki'||author.includes('s0yukudreamzs');
+   return mentionsPilot&&!isOwner;
   });
   count.textContent=String(items.length);
   list.replaceChildren();
