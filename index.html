@@ -1622,10 +1622,13 @@ document.addEventListener('click',function(e){var b=e.target.closest&&e.target.c
   const items=allItems.filter(v=>{
    const author=String(v.author||'').trim().toLowerCase();
    const message=String(v.message||'');
-   // A real customer vouch must mention the pilot in Discord.
+   // Only accept a client review using the vouch template and mentioning their pilot.
    const mentionsPilot=/<@!?\d+>/.test(message);
+   const hasService=/service\s*(ordered|purchased)\s*:/i.test(message);
+   const hasExperience=/experience\s*:/i.test(message);
+   const hasFeedback=/feedback\s*:/i.test(message);
    const isOwner=author==='soyuki'||author.includes('s0yukudreamzs');
-   return mentionsPilot&&!isOwner;
+   return mentionsPilot&&hasService&&(hasExperience||hasFeedback)&&!isOwner;
   });
   count.textContent=String(items.length);
   list.replaceChildren();
